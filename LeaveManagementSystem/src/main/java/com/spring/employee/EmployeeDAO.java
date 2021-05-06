@@ -31,9 +31,9 @@ public class EmployeeDAO {
 	    template.delete(c);
 	} 
 	
-	public Employee getEmployeeById(int s){ 
+	public Employee getEmployeeById(long userId){ 
 		List<Employee> employee=new ArrayList<Employee>();
-		employee=(List<Employee>) template.findByNamedParam("from Employee as e where e.id= :id", "id", s);
+		employee=(List<Employee>) template.findByNamedParam("from Employee as e where e.id= :id", "id", userId);
 		Employee c=employee.get(0);
 		return c;
 	} 
@@ -44,4 +44,17 @@ public class EmployeeDAO {
 		
 		return employee;
 	}
+	
+	public Employee getEmployeeByEmail(String email){ 
+		List<Employee> employee=new ArrayList<Employee>();
+		employee=(List<Employee>) template.findByNamedParam("from Employee as e where e.email= :email", "email", email);
+		Employee c;
+		if(employee.size()>0) {
+			c=employee.get(0);
+			}
+		else {
+			c=null;
+			}
+		return c;
+	} 
 	}  

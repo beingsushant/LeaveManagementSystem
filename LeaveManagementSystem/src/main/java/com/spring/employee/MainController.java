@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 //import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.apache.log4j.*;
 
@@ -31,54 +32,62 @@ public class MainController {
 	
 	@RequestMapping(value="/home",method = RequestMethod.GET)
 	public String home() {
-//		String string=null;
-//		string.length();
 		log.info("Home Page Initiated");
 		return "test";	}
 	
-	@RequestMapping("/exception_practice")
-	public String exceptionPractice() {
-		String string="Java is the best";
-		Integer.parseInt(string);
-		return "index";
-	}
+	@RequestMapping("/login")    
+    public String login(@ModelAttribute(name = "employeeLogin") Login loginEmployee,Model m){    
+		log.info("Login Page Initiated");
+        return "login";    
+    } 
 	
-	
-	@RequestMapping("/login")
+	@RequestMapping("/register")
 	public String SignIn(@ModelAttribute("employee") Employee employee,Model m) {
 		List<String> gender = new ArrayList<String>();
 		gender.add("Male");
 		gender.add("Female");
 		m.addAttribute("gender", gender);
-		log.info("Login Page Initiated");
-		return "login";
+		log.info("Registration Page Initiated");
+		return "register";
 	}
 	
 	@RequestMapping("/uservalidation")
 	public String userValidation(Model model, @Valid @ModelAttribute("employee") Employee employee, Errors errors  ) {
 		if(errors.hasErrors()) {
 			log.warn("Invalid Login");
+			return "register";
+		}
+		model.addAttribute("employee1", employee);
+		employeeDAO.saveEmployee(employee);
+		log.info("Login Successful");
+			return "employee";
+		}
+	
+	@RequestMapping("/loginvalidation")
+	public String loginValidation(Model model, @ModelAttribute(name = "employeeLogin") Login loginEmployee, Errors errors  ) {
+		if(errors.hasErrors()) {
+			log.warn("Invalid Login");
 			return "login";
 		}
-		log.info("--------------------------"+employee.getId());
-		employeeList.add(employee);
-		employeeDAO.saveEmployee(employee);
-		model.addAttribute("Name", employee.getFirstName());
-		log.info("Login Successful");
-			return "redirect:/viewemployee";
+       Employee validatedEmployee=employeeDAO.getEmployeeByEmail(loginEmployee.getEmail());
+		if(validatedEmployee!=null && validatedEmployee.getPassword().equals(loginEmployee.getPassword())) {
+			model.addAttribute("employee1", validatedEmployee);
+			log.info("Login Successful");
+				return "employee";
+		}
+		else {
+			return "login";
+		}
+
 		}
 	
 	
-	@RequestMapping(path = "/details/{name}")
-	public String studentProfile(@PathVariable("name") String user, Model model) {
+	@RequestMapping(path = "/details/{id}")
+	public String employeeProfile(@PathVariable("id") long userId, Model model) {
 		log.info("Employee Profile Accessed");
-		for (Employee employee : employeeList) {
-			if (employee.getFirstName().equals(user)) {
-				model.addAttribute("usern", employee);
-			}
-		}
-		
-		return "employee";
+		Employee employee = employeeDAO.getEmployeeById(userId);
+		model.addAttribute("currentEmployee", employee);
+		return "employeeprofile";
 	}
 	
 	@RequestMapping("/viewemployee")    
@@ -102,19 +111,4 @@ public class MainController {
         m.addAttribute("list",list); 
         return "viewemployee";    
     }   
-	
-	
-	
-//	@ExceptionHandler(value=NullPointerException.class)
-//	public String CustomExceptionHandler(Model m) {
-//		m.addAttribute("message", "Null Point Exception Has Occured");
-//		return "null_pointer";
-//	}
-//	
-//	@ResponseStatus(value=HttpStatus.INTERNAL_SERVER_ERROR)
-//	@ExceptionHandler(value=Exception.class)
-//	public String GlobalExceptionHandler(Model m) {
-//		m.addAttribute("message2", "Exception Has Occured");
-//		return "exception";
-//	}
 }
