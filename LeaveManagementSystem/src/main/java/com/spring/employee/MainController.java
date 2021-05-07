@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import org.apache.log4j.*;
 
 @Controller
@@ -35,6 +36,13 @@ public class MainController {
 		log.info("Login Page Initiated");
         return "login";    
     } 
+	
+	@RequestMapping("/test")    
+    public String login(){    
+		log.info("Login Page Initiated");
+        return "index";    
+    } 
+	
 	
 	@RequestMapping("/register")
 	public String SignIn(@ModelAttribute("employee") Employee employee,Model m) {
@@ -62,6 +70,18 @@ public class MainController {
 			return "login";
 		}
 
+		}
+	
+	@RequestMapping("/uservalidation")
+	public String userValidation(Model model, @Valid @ModelAttribute("employee") Employee employee, Errors errors  ) {
+		if(errors.hasErrors()) {
+			log.warn("Invalid Login");
+			return "register";
+		}
+        employeeDAO.saveEmployee(employee);
+		model.addAttribute("Name", employee.getFirstName());
+		log.info("Login Successful");
+			return "redirect:/viewemployee";
 		}
 	
 	@RequestMapping(path = "/details/{id}")
