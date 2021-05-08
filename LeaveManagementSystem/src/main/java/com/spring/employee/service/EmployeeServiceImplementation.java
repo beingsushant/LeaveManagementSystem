@@ -6,9 +6,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.spring.employee.Login;
 import com.spring.employee.dao.EmployeeDAO;
 import com.spring.employee.model.Employee;
+import com.spring.employee.model.Login;
 
 @Service
 public class EmployeeServiceImplementation implements EmployeeService{

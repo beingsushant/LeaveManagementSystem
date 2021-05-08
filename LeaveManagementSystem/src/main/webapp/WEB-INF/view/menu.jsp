@@ -49,10 +49,10 @@
 </head>
 <body>
 	<div class="topnav">
-<%-- 		<a href="${pageContext.request.contextPath}/admin/home">Home</a> --%>
-<%-- 		<a href="${pageContext.request.contextPath}/admin/employee">Employee</a> --%>
-<%-- 		<a href="${pageContext.request.contextPath}/admin/leaveRequests">LeaveRequests</a> --%>
-<%-- 		<a href="${pageContext.request.contextPath}/admin/leaveQuota">LeaveQuota</a> --%>
+		<a href="/LeaveManagementSystem/details/${currentEmployee.id}">Home</a>
+		<a href="/LeaveManagementSystem/details/${currentEmployee.id}">Employee</a>
+		<a href="/LeaveManagementSystem/details/${currentEmployee.id}">LeaveRequests</a>
+		<a href="/LeaveManagementSystem/details/${currentEmployee.id}">LeaveQuota</a>
 		<a href="/LeaveManagementSystem/details/${currentEmployee.id}">Profile</a>
 		<a href="/LeaveManagementSystem/updatepassword/${currentEmployee.id}">ChangePassword</a> 
 		<a href="/LeaveManagementSystem/login">Logout</a>

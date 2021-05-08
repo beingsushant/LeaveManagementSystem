@@ -16,9 +16,8 @@
 
 <div align="center"
 		class="container">
-		<h1 align="right"
-			style="color: #1b2e35; font-family: sans-serif; margin-right: 101px">Employee
-			Login</h1>
+		<h1 align="center"
+			style="color: #1b2e35; font-family: sans-serif;">Change Password</h1>
 		<form:form action="/LeaveManagementSystem/changepassword/${currentEmployee.id}">
 			<table
 				style="background-color: #1b2e35; border-style: !important; border-spacing: 29px;">

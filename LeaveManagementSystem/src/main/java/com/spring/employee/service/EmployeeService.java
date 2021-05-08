@@ -2,8 +2,8 @@ package com.spring.employee.service;
 
 import java.util.List;
 
-import com.spring.employee.Login;
 import com.spring.employee.model.Employee;
+import com.spring.employee.model.Login;
 
 public interface EmployeeService {
 
