@@ -20,6 +20,9 @@
 	<mvc:annotation-driven />
 	<context:component-scan
 		base-package="com.spring.employee" />
+		
+    <mvc:resources location="/images/" mapping="/images/**"/>
+    <mvc:resources location="/css/" mapping="/css/**"/>
 
 	<bean id="localeResolver"
 		class="org.springframework.web.servlet.i18n.SessionLocaleResolver">
@@ -92,6 +95,6 @@
 		<property name="sessionFactory" ref="sessionFactory"></property>
 		<property name="checkWriteOperations" value="false"></property>
 	</bean>
-
+	
 
 </beans>

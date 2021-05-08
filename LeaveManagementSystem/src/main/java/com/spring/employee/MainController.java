@@ -1,35 +1,31 @@
 package com.spring.employee;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Null;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
-//import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-//import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
-import org.apache.log4j.*;
+import com.spring.employee.model.Employee;
+import com.spring.employee.service.EmployeeServiceImplementation;
+
 
 @Controller
 public class MainController {
-    
-	List<Employee> employeeList = new ArrayList<Employee>();
-	public static Logger log = Logger.getLogger(MainController.class);
 	
 	@Autowired
-	private EmployeeDAO employeeDAO;
+	EmployeeServiceImplementation service;
+	private String gender = "gender";
+    
+	private static final Logger log = Logger.getLogger(MainController.class);
 	
 	@RequestMapping("/login")    
     public String login(@ModelAttribute(name = "employeeLogin") Login loginEmployee,Model m){    
@@ -40,81 +36,106 @@ public class MainController {
 	@RequestMapping("/test")    
     public String login(){    
 		log.info("Login Page Initiated");
-        return "index";    
+        return "home";    
     } 
 	
 	
 	@RequestMapping("/register")
-	public String SignIn(@ModelAttribute("employee") Employee employee,Model m) {
-		List<String> gender = new ArrayList<String>();
-		gender.add("Male");
-		gender.add("Female");
-		m.addAttribute("gender", gender);
+	public String signIn(@ModelAttribute("employee") Employee employee1,Model m) {
+		
+		Employee employee = employee1;
+		m.addAttribute(gender, service.initGender());
 		log.info("Registration Page Initiated");
 		return "register";
+		
 	}
 	
-	@RequestMapping("/loginvalidation")
+	@RequestMapping("/employeedashboard")
 	public String loginValidation(Model model, @ModelAttribute(name = "employeeLogin") Login loginEmployee, Errors errors  ) {
 		if(errors.hasErrors()) {
 			log.warn("Invalid Login");
 			return "login";
 		}
-       Employee validatedEmployee=employeeDAO.getEmployeeByEmail(loginEmployee.getEmail());
-		if(validatedEmployee!=null && validatedEmployee.getPassword().equals(loginEmployee.getPassword())) {
-			model.addAttribute("employee1", validatedEmployee);
+		
+		if(service.employeeValidation(loginEmployee)) {
+			model.addAttribute("currentEmployee", service.getEmployeeByEmail(loginEmployee.getEmail()));
 			log.info("Login Successful");
-				return "employee";
+			return "employeedashboard";
 		}
 		else {
-			return "login";
+			return "redirect:/login";
 		}
 
-		}
+	}
 	
 	@RequestMapping("/uservalidation")
-	public String userValidation(Model model, @Valid @ModelAttribute("employee") Employee employee, Errors errors  ) {
-		if(errors.hasErrors()) {
+	public String userValidation(Model model, @Valid @ModelAttribute("employee") Employee employee1, BindingResult result ) {
+		
+		Employee employee = employee1;
+		
+		if(result.hasErrors()) {
 			log.warn("Invalid Login");
+			model.addAttribute(gender, service.initGender());
 			return "register";
 		}
-        employeeDAO.saveEmployee(employee);
-		model.addAttribute("Name", employee.getFirstName());
+        service.saveEmployee(employee);
+        model.addAttribute("currentEmployee", employee);
 		log.info("Login Successful");
-			return "redirect:/viewemployee";
+			return "employeedashboard";
 		}
 	
 	@RequestMapping(path = "/details/{id}")
 	public String employeeProfile(@PathVariable("id") long userId, Model model) {
 		log.info("Employee Profile Accessed");
-		Employee employee = employeeDAO.getEmployeeById(userId);
+		
+		Employee employee = service.getEmployeeById(userId);
 		model.addAttribute("currentEmployee", employee);
 		return "employeeprofile";
 	}
 	
 	@RequestMapping("/viewemployee")    
     public String viewemp(Model m){    
-        List<Employee> list=employeeDAO.getEmployees(); 
+		
+        List<Employee> list=service.getEmployees(); 
         m.addAttribute("list",list);  
-        return "viewemployee";    
+        return "viewemployee";
     }    
 	
 	@RequestMapping(path = "/editemployee/{id}")    
     public String viewemp(@PathVariable(name = "id") int id,Model m){    
-        Employee employee = employeeDAO.getEmployeeById(id);   
+		
+        Employee employee = service.getEmployeeById(id);   
         m.addAttribute("command",employee); 
-        List<String> gender = new ArrayList<String>();
-		gender.add("Male");
-		gender.add("Female");
-        m.addAttribute("gender", gender);
+        m.addAttribute("currentEmployee", employee);
+        m.addAttribute(gender, service.initGender());
         return "editprofile";
     }    
 	
-	@RequestMapping(path = "/updateemployee")    
-    public String viewemp(@ModelAttribute Employee employee,Model m){    
-        employeeDAO.updateEmployee(employee);  
-        List<Employee> list=employeeDAO.getEmployees();    
+	@RequestMapping(path = "/updateemployee/{id}")    
+    public String viewemp(@ModelAttribute Employee employee1,Model m){  
+		Employee employee = employee1;
+        service.updateEmployee(employee);  
+        List<Employee> list=service.getEmployees();
+        m.addAttribute("currentEmployee", employee);
         m.addAttribute("list",list); 
-        return "viewemployee";    
-    }   
+        return "employeeprofile";  
+    }  
+	
+	@RequestMapping(path = "/updatepassword/{id}")    
+    public String updatePassword(@PathVariable(name = "id") int id,Model m){  
+		Employee employee = service.getEmployeeById(id);
+		m.addAttribute("command", employee);
+        m.addAttribute("currentEmployee", employee);
+        return "changepassword";
+    }
+	
+	@RequestMapping(path = "/changepassword/{id}")
+	public String updatePassword(@RequestParam("password") String password, @PathVariable(name = "id") int id, Model m) {
+			Employee employee = service.getEmployeeById(id);
+			employee.setPassword(password);
+			service.updateEmployee(employee);
+			m.addAttribute("currentEmployee", employee);
+			return "employeedashboard";
+		
+	}
 }

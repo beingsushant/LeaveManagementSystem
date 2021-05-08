@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class AllExceptionHandler {
 	
 	@ExceptionHandler(value=NullPointerException.class)
-	public String CustomExceptionHandler(Model m) {
+	public String customExceptionHandler(Model m) {
 		m.addAttribute("message", "Null Point Exception Has Occured");
 		return "null_pointer";
 	}
 	
 	@ResponseStatus(value=HttpStatus.INTERNAL_SERVER_ERROR)
 	@ExceptionHandler(value=Exception.class)
-	public String GlobalExceptionHandler(Model m) {
+	public String globalExceptionHandler(Model m) {
 		m.addAttribute("message2", "Exception Has Occured");
 		return "exception";
 	}

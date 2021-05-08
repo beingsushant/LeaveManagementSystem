@@ -25,4 +25,4 @@
    </c:forEach>  
    </table>  
    <br/>  
-   <a href="register">Logout</a>  
+   <a href="login">Logout</a>  

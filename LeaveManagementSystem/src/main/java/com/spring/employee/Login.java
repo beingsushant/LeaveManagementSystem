@@ -28,8 +28,7 @@ public class Login {
 		this.password = password;
 	}
 	public Login() {
-		super();
-		// TODO Auto-generated constructor stub
+		// Constructor
 	}
 	@Override
 	public String toString() {
