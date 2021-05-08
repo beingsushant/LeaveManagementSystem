@@ -1,3 +1,3 @@
 # LeaveManagementSystem
 
-This is latest version of project. Will add more features and update tomorrow.
+9999% Project is complete. Ctearting Seperate CSS file is left. And little organization.
