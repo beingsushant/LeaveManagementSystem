@@ -15,16 +15,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.spring.employee.model.Employee;
+import com.spring.employee.model.EmployeeDTO;
 import com.spring.employee.model.Login;
-import com.spring.employee.service.EmployeeServiceImplementation;
+import com.spring.employee.service.EmployeeService;
 
 
 @Controller
 public class MainController {
 	
 	@Autowired
-	EmployeeServiceImplementation service;
+	EmployeeService service;
 	private String gender = "gender";
+	private String currentEmployee = "currentEmployee";
+	private String employeedashboard = "employeedashboard";
     
 	private static final Logger log = Logger.getLogger(MainController.class);
 	
@@ -42,9 +45,7 @@ public class MainController {
 	
 	
 	@RequestMapping("/register")
-	public String signIn(@ModelAttribute("employee") Employee employee1,Model m) {
-		
-		Employee employee = employee1;
+	public String signIn(@ModelAttribute("employee") EmployeeDTO employeeDto,Model m) {
 		m.addAttribute(gender, service.initGender());
 		log.info("Registration Page Initiated");
 		return "register";
@@ -59,9 +60,9 @@ public class MainController {
 		}
 		
 		if(service.employeeValidation(loginEmployee)) {
-			model.addAttribute("currentEmployee", service.getEmployeeByEmail(loginEmployee.getEmail()));
+			model.addAttribute(currentEmployee, service.getEmployeeByEmail(loginEmployee.getEmail()));
 			log.info("Login Successful");
-			return "employeedashboard";
+			return employeedashboard;
 		}
 		else {
 			return "redirect:/login";
@@ -70,9 +71,8 @@ public class MainController {
 	}
 	
 	@RequestMapping("/uservalidation")
-	public String userValidation(Model model, @Valid @ModelAttribute("employee") Employee employee1, BindingResult result ) {
-		
-		Employee employee = employee1;
+	public String userValidation(Model model, @Valid @ModelAttribute("employee") EmployeeDTO employeeDto, BindingResult result ) {
+		Employee employee = service.mapEmployee(employeeDto);
 		
 		if(result.hasErrors()) {
 			log.warn("Invalid Login");
@@ -80,9 +80,9 @@ public class MainController {
 			return "register";
 		}
         service.saveEmployee(employee);
-        model.addAttribute("currentEmployee", employee);
+        model.addAttribute(currentEmployee, employee);
 		log.info("Login Successful");
-			return "employeedashboard";
+			return employeedashboard;
 		}
 	
 	@RequestMapping(path = "/details/{id}")
@@ -90,7 +90,7 @@ public class MainController {
 		log.info("Employee Profile Accessed");
 		
 		Employee employee = service.getEmployeeById(userId);
-		model.addAttribute("currentEmployee", employee);
+		model.addAttribute(currentEmployee, employee);
 		return "employeeprofile";
 	}
 	
@@ -107,17 +107,17 @@ public class MainController {
 		
         Employee employee = service.getEmployeeById(id);   
         m.addAttribute("command",employee); 
-        m.addAttribute("currentEmployee", employee);
+        m.addAttribute(currentEmployee, employee);
         m.addAttribute(gender, service.initGender());
         return "editprofile";
     }    
 	
 	@RequestMapping(path = "/updateemployee/{id}")    
-    public String viewemp(@ModelAttribute Employee employee1,Model m){  
-		Employee employee = employee1;
+    public String viewemp(@ModelAttribute EmployeeDTO employeeDto,Model m){  
+		Employee employee = service.mapEmployee(employeeDto);
         service.updateEmployee(employee);  
         List<Employee> list=service.getEmployees();
-        m.addAttribute("currentEmployee", employee);
+        m.addAttribute(currentEmployee, employee);
         m.addAttribute("list",list); 
         return "employeeprofile";  
     }  
@@ -126,7 +126,7 @@ public class MainController {
     public String updatePassword(@PathVariable(name = "id") int id,Model m){  
 		Employee employee = service.getEmployeeById(id);
 		m.addAttribute("command", employee);
-        m.addAttribute("currentEmployee", employee);
+        m.addAttribute(currentEmployee, employee);
         return "changepassword";
     }
 	
@@ -135,8 +135,8 @@ public class MainController {
 			Employee employee = service.getEmployeeById(id);
 			employee.setPassword(password);
 			service.updateEmployee(employee);
-			m.addAttribute("currentEmployee", employee);
-			return "employeedashboard";
+			m.addAttribute(currentEmployee, employee);
+			return employeedashboard;
 		
 	}
 }

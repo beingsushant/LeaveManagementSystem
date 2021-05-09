@@ -1,7 +1,6 @@
 package com.spring.employee.dao;
 
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -14,44 +13,48 @@ import com.spring.employee.model.Employee;
 
 @Transactional
 @Repository("employeeDAO")
-public class EmployeeDAO {
+public class EmployeeDAO implements EmployeeDaoInterface{
 	
 	@Autowired
 	private HibernateTemplate template;
 	
+	@Override
 	public void saveEmployee(Employee c){  
        template.save(c);
 	}  
 	
+	@Override
 	public void updateEmployee(Employee c){  
 	    template.update(c);
 	}  
 	 
-	
+	@Override
 	public void deleteEmployee(Employee c){  
 	    template.delete(c);
 	} 
 	
+	@Override
 	public Employee getEmployeeById(long userId){ 
-		List<Employee> employee=new ArrayList<Employee>();
+		List<Employee> employee;
 		employee=(List<Employee>) template.findByNamedParam("from Employee as e where e.id= :id", "id", userId);
-		Employee c=employee.get(0);
-		return c;
+		return employee.get(0);
 	} 
 	
+	@Override
 	public List<Employee> getEmployees(){    
-		List<Employee> employee=new ArrayList<Employee>();
+		List<Employee> employee;
 		employee=(List<Employee>) template.find("from Employee");
 		
 		return employee;
 	}
 	
 
+	@Override
 	public Employee getEmployeeByEmail(String email){ 
-		List<Employee> employee=new ArrayList<Employee>();
+		List<Employee> employee;
 		employee=(List<Employee>) template.findByNamedParam("from Employee as e where e.email= :email", "email", email);
 		Employee c;
-		if(employee.size()>0) {
+		if(!employee.isEmpty()) {
 			c=employee.get(0);
 			}
 		else {
